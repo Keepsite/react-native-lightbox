@@ -13,7 +13,6 @@ var {
   Dimensions,
   PanResponder,
   TouchableOpacity,
-  StatusBar,
   Modal,
   Platform,
 } = React;
@@ -21,7 +20,6 @@ var {
 var WINDOW_HEIGHT = Dimensions.get('window').height;
 var WINDOW_WIDTH = Dimensions.get('window').width;
 var DRAG_DISMISS_THRESHOLD = 150;
-var STATUS_BAR_OFFSET = (Platform.OS === 'android' ? -25 : 0);
 
 var LightboxOverlay = React.createClass({
   propTypes: {
@@ -109,7 +107,6 @@ var LightboxOverlay = React.createClass({
   },
 
   open: function() {
-    StatusBar.setHidden(true, 'fade');
     this.state.pan.setValue(0);
     this.setState({
       isAnimating: true,
@@ -127,7 +124,6 @@ var LightboxOverlay = React.createClass({
   },
 
   close: function() {
-    StatusBar.setHidden(false, 'fade');
     this.setState({
       isAnimating: true,
     });
@@ -184,7 +180,7 @@ var LightboxOverlay = React.createClass({
 
     var openStyle = [styles.open, {
       left:   openVal.interpolate({inputRange: [0, 1], outputRange: [origin.x, target.x]}),
-      top:    openVal.interpolate({inputRange: [0, 1], outputRange: [origin.y + STATUS_BAR_OFFSET, target.y + STATUS_BAR_OFFSET]}),
+      top:    openVal.interpolate({inputRange: [0, 1], outputRange: [origin.y, target.y]}),
       width:  openVal.interpolate({inputRange: [0, 1], outputRange: [origin.width, WINDOW_WIDTH]}),
       height: openVal.interpolate({inputRange: [0, 1], outputRange: [origin.height, WINDOW_HEIGHT]}),
     }];
@@ -213,7 +209,11 @@ var LightboxOverlay = React.createClass({
       );
     }
     return (
-      <Modal visible={isOpen} transparent={true}>
+      <Modal
+        visible={isOpen}
+        transparent={true}
+        onRequestClose={this.close}
+      >
         {background}
         {content}
         {header}
